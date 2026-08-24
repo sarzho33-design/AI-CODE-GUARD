@@ -1,0 +1,37 @@
+name: 'AI Code Guard'
+description: 'Security gate for AI-generated code changes — deterministic checks plus evidence-based AI review, reported directly in the PR.'
+author: 'Sar Zho'
+branding:
+  icon: 'shield'
+  color: 'red'
+
+inputs:
+  github-token:
+    description: 'Token used to read the PR diff and post the report comment. Defaults to the workflow token.'
+    required: false
+    default: ${{ github.token }}
+  anthropic-api-key:
+    description: 'API key for AI-based analysis. If omitted, only deterministic checks run.'
+    required: false
+  fail-on:
+    description: 'Minimum severity that fails the check: critical | high | medium | none'
+    required: false
+    default: 'critical'
+  max-files:
+    description: 'Max changed files to analyze with AI (cost control)'
+    required: false
+    default: '30'
+  ignore-paths:
+    description: 'Comma-separated glob patterns to exclude (e.g. "dist/**,*.lock")'
+    required: false
+    default: ''
+
+outputs:
+  risk-level:
+    description: 'Overall risk level: none | low | medium | high | critical'
+  findings-json:
+    description: 'Raw JSON of all findings'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
