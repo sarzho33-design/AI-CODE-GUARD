@@ -9,7 +9,11 @@ jobs:
   security-review:
     runs-on: ubuntu-latest
     steps:
+ HEAD
       - uses: sarzho33-design/AI-CODE-GUARD@v1
+
+      - uses:  sarzho33-design/AI-CODE-GUARD@v1
+origin/main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           fail-on: critical
