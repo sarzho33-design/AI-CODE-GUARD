@@ -1,4 +1,3 @@
-﻿const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function createCustomer(email) {
   if (!email || !email.includes('@')) {
