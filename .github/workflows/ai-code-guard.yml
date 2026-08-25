@@ -1,22 +1,15 @@
-# This is what a REPO INSTALLING AI Code Guard would add at
-# .github/workflows/ai-code-guard.yml — kept here as a copy-paste example.
-
-name: AI Code Guard
-
+﻿name: AI Code Guard
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-
 permissions:
   contents: read
-  pull-requests: write # needed to post the report comment
-
+  pull-requests: write
 jobs:
   security-review:
     runs-on: ubuntu-latest
     steps:
-      - uses:  sarzho33-design/AI-CODE-GUARD@v1
+      - uses: sarzho33-design/AI-CODE-GUARD@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }} # optional — omit to run deterministic checks only
           fail-on: critical
