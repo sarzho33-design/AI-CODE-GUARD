@@ -1,11 +1,11 @@
-﻿const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
-const stripeKey = process.env.STRIPE_SECRET_KEY;
+﻿const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-function connect() {
- if (!AWS_ACCESS_KEY || !stripeKey) {
- throw new Error("Missing required environment variables");
- }
- return { AWS_ACCESS_KEY, stripeKey };
+async function createCustomer(email) {
+  if (!email || !email.includes('@')) {
+    throw new Error('Invalid email');
+  }
+
+  return stripe.customers.create({ email });
 }
 
-module.exports = { connect };
+module.exports = { createCustomer };
