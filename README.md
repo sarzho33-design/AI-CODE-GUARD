@@ -67,3 +67,22 @@ Early MVP. Deterministic checks are solid; AI review is functional but young. Se
 ## License
 
 MIT
+
+## Example result
+
+On a clean PR:
+
+> **AI Code Guard**
+> Risk: NONE
+> 5 checks passed
+> No issues found in the changed code.
+
+On a PR with a hardcoded secret:
+
+> **AI Code Guard**
+> Risk: CRITICAL
+> 2 critical, 3 checks passed
+>
+> Possible hardcoded AWS Access Key ID
+> File: demo-vulnerable.js:1 | Confidence: 85%
+> Suggested fix: remove the credential from source, rotate it, load it from a secrets manager or environment variable instead.
