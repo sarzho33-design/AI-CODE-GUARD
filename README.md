@@ -21,7 +21,7 @@ jobs:
   security-review:
     runs-on: ubuntu-latest
     steps:
-      - uses: YOURNAME/ai-code-guard@v1
+      - uses: sarzho33-design/AI-CODE-GUARD@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }} # optional
