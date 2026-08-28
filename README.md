@@ -1,22 +1,27 @@
 # 🛡️ AI Code Guard
 
-A GitHub-native security gate for AI-generated code. Runs on every pull request, catches obvious problems deterministically, and adds evidence-grounded AI review on top — all reported directly in the PR, no dashboard required.
+AI-generated code ships fast. Security review doesn't keep up.
+
+AI Code Guard scans every pull request for security issues automatically — free deterministic checks, no config, no dashboard. Optional AI review for the stuff regex can't catch.
+
+![AI Code Guard demo](https://github.com/user-attachments/assets/1efe3ea0-bc20-4f54-b8e7-d057d226f0e1)
+
+![AI Code Guard demo — clean scan after fix](https://github.com/user-attachments/assets/5db843c8-069e-4803-9ee0-80b23d16a6f4)
 
 ## Install
 
 Add this to `.github/workflows/ai-code-guard.yml` in the repo you want protected:
 
+No configuration needed. Paste this in, commit, open a PR — that's it.
+
 ```yaml
 name: AI Code Guard
-
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-
 permissions:
   contents: read
   pull-requests: write
-
 jobs:
   security-review:
     runs-on: ubuntu-latest
@@ -30,16 +35,33 @@ jobs:
 
 Free tier runs deterministic checks with no API key needed. Add `anthropic-api-key` to unlock AI-based review of logic-level issues (broken auth, business-logic flaws, context-dependent injection risks).
 
+## Example result
+
+On a clean PR:
+> **AI Code Guard**
+> Risk: NONE
+> 5 checks passed
+> No issues found in the changed code.
+
+On a PR with a hardcoded secret:
+> **AI Code Guard**
+> Risk: CRITICAL
+> 2 critical, 3 checks passed
+>
+> Possible hardcoded AWS Access Key ID
+> File: demo-vulnerable.js:1 | Confidence: 85%
+> Suggested fix: remove the credential from source, rotate it, load it from a secrets manager or environment variable instead.
+
 ## What it checks
 
-**Deterministic (no AI, no API cost):**
+**Free, always on:**
 - Hardcoded secrets — AWS/GitHub/Slack/Stripe/Google/Anthropic/OpenAI keys, private key blocks, JWTs, generic password/token assignments
 - Dangerous commands — curl-pipe-to-shell, `rm -rf`, `eval()`, `shell=True`, unsafe `exec`/`execSync`, disabled TLS verification, unsafe deserialization
 - Workflow permissions — `write-all`, risky `pull_request_target` + checkout-head combos, self-hosted runners on untrusted triggers
 - Dependencies — non-registry sources (git/file URLs), unpinned wildcard versions
 - Injection patterns — string-built SQL, raw `innerHTML`/`dangerouslySetInnerHTML`, concatenated shell commands
 
-**AI-assisted (requires `anthropic-api-key`):**
+**Optional, needs your API key:**
 - Context-dependent issues that need understanding intent: broken authorization, missing validation on a path that reaches a sink, insecure defaults, business-logic flaws
 
 Every AI finding must cite an exact snippet from the diff as evidence — findings whose "evidence" isn't a real substring of the code sent to the model are dropped before you ever see them. **No evidence, no report.**
@@ -50,6 +72,14 @@ Every AI finding must cite an exact snippet from the diff as evidence — findin
 - **False positives are the enemy.** A tool that cries wolf gets uninstalled. See `tests/fixtures/safe/` for the false-positive regression suite.
 - **Structured findings only.** Every finding follows Finding → Evidence → Explanation → Recommendation, with a confidence score.
 
+## Status
+
+Early MVP. Deterministic checks are solid; AI review is functional but young. See `tests/fixtures/` for what's currently covered — contributions of new vulnerable/safe test cases are the highest-leverage way to help.
+
+## License
+
+MIT
+
 ## Local development
 
 ```bash
@@ -59,30 +89,5 @@ npm run build      # bundles src/ -> dist/index.js (this is what actually ships)
 ```
 
 `dist/` is committed (standard practice for JS-based GitHub Actions, since Actions don't run a build step for you). CI verifies `dist/` is in sync with `src/` on every push.
+Interested in private-repo support, AI review included, custom policies, or team features? [Open an issue](https://github.com/sarzho33-design/AI-CODE-GUARD/issues) and tell us what you'd need.
 
-## Status
-
-Early MVP. Deterministic checks are solid; AI review is functional but young. See `tests/fixtures/` for what's currently covered — contributions of new vulnerable/safe test cases are the highest-leverage way to help.
-
-## License
-
-MIT
-
-## Example result
-
-On a clean PR:
-
-> **AI Code Guard**
-> Risk: NONE
-> 5 checks passed
-> No issues found in the changed code.
-
-On a PR with a hardcoded secret:
-
-> **AI Code Guard**
-> Risk: CRITICAL
-> 2 critical, 3 checks passed
->
-> Possible hardcoded AWS Access Key ID
-> File: demo-vulnerable.js:1 | Confidence: 85%
-> Suggested fix: remove the credential from source, rotate it, load it from a secrets manager or environment variable instead.
