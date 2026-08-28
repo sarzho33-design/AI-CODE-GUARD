@@ -1,20 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>AI Code Guard Pricing</title>
+  <title>AI Code Guard - Pricing</title>
 </head>
 <body>
 
-<h1>AI Code Guard</h1> 
+<h1>AI Code Guard</h1>
+<h2>Choose your plan</h2>
 
-<h2>Pro — $49/month</h2>
+<h3>Pro — €19/month</h3>
 
-<div id="paypal-pro"></div>
-
-<h2>Team — $299/month</h2>
-
-<div id="paypal-team"></div>
+<div id="paypal-button-container-P-2RH185477M7992629NKI36JA"></div>
 
 <script src="https://www.paypal.com/sdk/js?client-id=BAAALL-ZiC6XHIsTEDk5cExrmld4204lEOW12GzvuAF4k-3UzflVO48MhMhoM6uvH1Xuk4VIZOzYGDA34k&vault=true&intent=subscription"></script>
 
@@ -26,32 +22,18 @@ paypal.Buttons({
     layout: 'vertical',
     label: 'subscribe'
   },
+
   createSubscription: function(data, actions) {
     return actions.subscription.create({
       plan_id: 'P-2RH185477M7992629NKI36JA'
     });
   },
-  onApprove: function(data) {
-    alert('Pro subscription created: ' + data.subscriptionID);
-  } 
-}).render('#paypal-pro');
 
-paypal.Buttons({
-  style: {
-    shape: 'rect',
-    color: 'gold',
-    layout: 'vertical',
-    label: 'subscribe'
-  },
-  createSubscription: function(data, actions) {
-    return actions.subscription.create({
-      plan_id: 'P-1X082266R7537971VNKI37LA'
-    });
-  },
   onApprove: function(data) {
-    alert('Team subscription created: ' + data.subscriptionID);
+    alert('Payment successful! Subscription: ' + data.subscriptionID);
   }
-}).render('#paypal-team');
+
+}).render('#paypal-button-container-P-2RH185477M7992629NKI36JA');
 </script>
 
 </body>
