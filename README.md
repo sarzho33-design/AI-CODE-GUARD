@@ -6,6 +6,8 @@ AI Code Guard scans every pull request for security issues automatically — fre
 
 ![AI Code Guard demo](https://github.com/user-attachments/assets/1efe3ea0-bc20-4f54-b8e7-d057d226f0e1)
 
+![AI Code Guard demo — clean scan after fix](https://github.com/user-attachments/assets/5db843c8-069e-4803-9ee0-80b23d16a6f4)
+
 ## Install
 
 Add this to `.github/workflows/ai-code-guard.yml` in the repo you want protected:
