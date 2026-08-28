@@ -89,3 +89,5 @@ npm run build      # bundles src/ -> dist/index.js (this is what actually ships)
 ```
 
 `dist/` is committed (standard practice for JS-based GitHub Actions, since Actions don't run a build step for you). CI verifies `dist/` is in sync with `src/` on every push.
+Interested in private-repo support, AI review included, custom policies, or team features? [Open an issue](https://github.com/sarzho33-design/AI-CODE-GUARD/issues) and tell us what you'd need.
+
