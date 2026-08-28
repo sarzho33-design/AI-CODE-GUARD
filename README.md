@@ -4,7 +4,7 @@ AI-generated code ships fast. Security review doesn't keep up.
 
 AI Code Guard scans every pull request for security issues automatically — free deterministic checks, no config, no dashboard. Optional AI review for the stuff regex can't catch.
 
-<!-- DEMO GIF GOES HERE once recorded -->
+![AI Code Guard demo](https://github.com/user-attachments/assets/1efe3ea0-bc20-4f54-b8e7-d057d226f0e1)
 
 ## Install
 
