@@ -6,31 +6,41 @@
 <body>
   <h1>AI Code Guard</h1>
   <h2>Choose your plan</h2>
+
   <h3>Pro - 49 euros/month</h3>
-  <div id="paypal-button-container-P-2RH185477M7992629NKI36JA"></div>
+  <div id="paypal-button-container-P-6L50725792378845DNKJN2II"></div>
+
   <h3>Team - 299 euros/month</h3>
-  <div id="paypal-button-container-TEAM_PLAN_ID"></div>
-  <script src="https://www.paypal.com/sdk/js?client-id=BAAALL-ZiC6XHIsTEDk5cExrmld4204lEOW12GzvuAF4k-3UzflVO48MhMhoM6uvH1Xuk4VIZOzYGDA34k&vault=true&intent=subscription"></script>
+  <div id="paypal-button-container-P-72908267184756502NKJPGTA"></div>
+
+  <script src="https://www.paypal.com/sdk/js?client-id=BAAFV_SbqFys8xc6a2nUWpGJeenZJ6eIrnBGX3jB-Yh1LXimr9PywDHlPJ2h-UDnpCKuxO1n6GxBNz06oY&vault=true&intent=subscription&currency=EUR"></script>
   <script>
     paypal.Buttons({
       style: { shape: "rect", color: "gold", layout: "vertical", label: "subscribe" },
       createSubscription: function(data, actions) {
-        return actions.subscription.create({ plan_id: "P-2RH185477M7992629NKI36JA" });
+        return actions.subscription.create({ plan_id: "P-6L50725792378845DNKJN2II" });
       },
       onApprove: function(data) {
         alert("Payment successful! Subscription: " + data.subscriptionID);
+      },
+      onError: function(err) {
+        console.error("PayPal error:", err);
       }
-    }).render("#paypal-button-container-P-2RH185477M7992629NKI36JA");
+    }).render("#paypal-button-container-P-6L50725792378845DNKJN2II");
 
     paypal.Buttons({
       style: { shape: "rect", color: "blue", layout: "vertical", label: "subscribe" },
       createSubscription: function(data, actions) {
-        return actions.subscription.create({ plan_id: "TEAM_PLAN_ID" });
+        return actions.subscription.create({ plan_id: "P-72908267184756502NKJPGTA" });
       },
       onApprove: function(data) {
         alert("Payment successful! Subscription: " + data.subscriptionID);
+      },
+      onError: function(err) {
+        console.error("PayPal error:", err);
       }
-    }).render("#paypal-button-container-TEAM_PLAN_ID");
+    }).render("#paypal-button-container-P-72908267184756502NKJPGTA");
   </script>
 </body>
 </html>
+<p><a href="history.html">View your scan history</a></p>
