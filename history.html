@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Code Guard - Scan History</title>
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+    input { padding: 8px; width: 300px; }
+    button { padding: 8px 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+    .CRITICAL { color: #c0392b; font-weight: bold; }
+    .NONE { color: #27ae60; }
+  </style>
+</head>
+<body>
+  <h1>Scan History</h1>
+  <p>Enter your license key to view your scan history.</p>
+  <input type="text" id="licenseKey" placeholder="Your license key">
+  <button onclick="loadHistory()">View History</button>
+  <div id="result"></div>
+
+  <script>
+    async function loadHistory() {
+      const licenseKey = document.getElementById('licenseKey').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = 'Loading...';
+
+      try {
+        const response = await fetch('https://ai-code-guard-license.sarzho33.workers.dev/history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ licenseKey })
+        });
+        const data = await response.json();
+
+        if (data.error) {
+          resultDiv.innerHTML = '<p style="color:red">' + data.error + '</p>';
+          return;
+        }
+
+        if (!data.scans || data.scans.length === 0) {
+          resultDiv.innerHTML = '<p>No scans logged yet.</p>';
+          return;
+        }
+
+        let html = '<table><tr><th>Date</th><th>Repo</th><th>Risk</th><th>Findings</th><th>PR</th></tr>';
+        data.scans.slice().reverse().forEach(scan => {
+          html += '<tr><td>' + new Date(scan.timestamp).toLocaleString() + '</td>' +
+                  '<td>' + scan.repo + '</td>' +
+                  '<td class="' + scan.risk + '">' + scan.risk + '</td>' +
+                  '<td>' + scan.findingsCount + '</td>' +
+                  '<td>' + (scan.prNumber || '-') + '</td></tr>';
+        });
+        html += '</table>';
+        resultDiv.innerHTML = html;
+      } catch (err) {
+        resultDiv.innerHTML = '<p style="color:red">Error loading history: ' + err.message + '</p>';
+      }
+    }
+  </script>
+</body>
+</html>
