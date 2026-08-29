@@ -36703,7 +36703,7 @@ const SEVERITY_RANK = {
 async function run() {
     try {
         const token = core.getInput('github-token', { required: true });
-        const apiKey = core.getInput('anthropic-api-key'); // optional
+        const apiKey = core.getInput('anthropic-api-key');
         const failOn = (core.getInput('fail-on') || 'critical');
         const maxFiles = parseInt(core.getInput('max-files') || '30', 10);
         const ignoreGlobs = (core.getInput('ignore-paths') || '')
@@ -36712,11 +36712,10 @@ async function run() {
             .filter(Boolean);
         const diff = await (0, github_1.getPullRequestDiff)(token, ignoreGlobs);
         if (!diff) {
-            core.info('No PR diff to analyze — exiting cleanly.');
+            core.info('No PR diff to analyze - exiting cleanly.');
             return;
         }
         core.info(`Analyzing ${diff.files.length} changed file(s) in PR #${diff.prNumber}`);
-        // Deterministic checks — always run, no API cost.
         const deterministicFindings = [
             ...(0, secrets_1.checkSecrets)(diff.files),
             ...(0, dangerousCommands_1.checkDangerousCommands)(diff.files),
@@ -36724,8 +36723,7 @@ async function run() {
             ...(0, injection_1.checkInjection)(diff.files),
             ...(0, dependencies_1.checkDependencies)(diff.files),
         ];
-        const deterministicChecksRun = 5 * diff.files.length; // rough count for "checks passed" display
-        // AI review — optional, only if a key was provided.
+        const deterministicChecksRun = 5 * diff.files.length;
         let aiFindings = [];
         if (apiKey) {
             try {
@@ -36736,10 +36734,29 @@ async function run() {
             }
         }
         else {
-            core.info('No anthropic-api-key provided — skipping AI review, deterministic checks only.');
+            core.info('No anthropic-api-key provided - skipping AI review, deterministic checks only.');
         }
         const allFindings = [...deterministicFindings, ...aiFindings];
         const risk = (0, github_1.worstSeverity)(allFindings);
+        const proLicenseKey = core.getInput('pro-license-key');
+        if (proLicenseKey) {
+            try {
+                await fetch('https://ai-code-guard-license.sarzho33.workers.dev/log-scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        licenseKey: proLicenseKey,
+                        repo: `${diff.owner}/${diff.repo}`,
+                        risk,
+                        findingsCount: allFindings.length,
+                        prNumber: diff.prNumber,
+                    }),
+                });
+            }
+            catch (err) {
+                core.warning(`Failed to log scan to history: ${err.message}`);
+            }
+        }
         const report = (0, report_1.formatReport)(allFindings, risk, deterministicChecksRun + (apiKey ? maxFiles : 0));
         await (0, github_1.postReportComment)(token, diff.owner, diff.repo, diff.prNumber, report);
         core.setOutput('risk-level', risk);

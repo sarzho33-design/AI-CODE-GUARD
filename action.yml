@@ -1,10 +1,9 @@
-name: 'AI Code Guard'
-description: 'Security gate for AI-generated code changes — deterministic checks plus evidence-based AI review, reported directly in the PR.'
+﻿name: 'AI Code Guard'
+description: 'Security gate for AI-generated code changes - deterministic checks plus evidence-based AI review, reported directly in the PR.'
 author: 'Sar Zho'
 branding:
   icon: 'shield'
   color: 'red'
-
 inputs:
   github-token:
     description: 'Token used to read the PR diff and post the report comment. Defaults to the workflow token.'
@@ -25,13 +24,14 @@ inputs:
     description: 'Comma-separated glob patterns to exclude (e.g. "dist/**,*.lock")'
     required: false
     default: ''
-
+  pro-license-key:
+    description: 'AI Code Guard Pro license key. If provided, logs this scan to your history dashboard.'
+    required: false
 outputs:
   risk-level:
     description: 'Overall risk level: none | low | medium | high | critical'
   findings-json:
     description: 'Raw JSON of all findings'
-
 runs:
   using: 'node20'
   main: 'dist/index.js'

@@ -1,4 +1,4 @@
-import * as core from '@actions/core';
+﻿import * as core from '@actions/core';
 import { getPullRequestDiff, postReportComment, worstSeverity } from './github';
 import { checkSecrets } from './checks/secrets';
 import { checkDangerousCommands } from './checks/dangerousCommands';
@@ -21,7 +21,7 @@ const SEVERITY_RANK: Record<Finding['severity'] | 'none', number> = {
 async function run(): Promise<void> {
   try {
     const token = core.getInput('github-token', { required: true });
-    const apiKey = core.getInput('anthropic-api-key'); // optional
+    const apiKey = core.getInput('anthropic-api-key');
     const failOn = (core.getInput('fail-on') || 'critical') as Finding['severity'] | 'none';
     const maxFiles = parseInt(core.getInput('max-files') || '30', 10);
     const ignoreGlobs = (core.getInput('ignore-paths') || '')
@@ -31,13 +31,12 @@ async function run(): Promise<void> {
 
     const diff = await getPullRequestDiff(token, ignoreGlobs);
     if (!diff) {
-      core.info('No PR diff to analyze — exiting cleanly.');
+      core.info('No PR diff to analyze - exiting cleanly.');
       return;
     }
 
     core.info(`Analyzing ${diff.files.length} changed file(s) in PR #${diff.prNumber}`);
 
-    // Deterministic checks — always run, no API cost.
     const deterministicFindings: Finding[] = [
       ...checkSecrets(diff.files),
       ...checkDangerousCommands(diff.files),
@@ -45,9 +44,8 @@ async function run(): Promise<void> {
       ...checkInjection(diff.files),
       ...checkDependencies(diff.files),
     ];
-    const deterministicChecksRun = 5 * diff.files.length; // rough count for "checks passed" display
+    const deterministicChecksRun = 5 * diff.files.length;
 
-    // AI review — optional, only if a key was provided.
     let aiFindings: Finding[] = [];
     if (apiKey) {
       try {
@@ -56,11 +54,30 @@ async function run(): Promise<void> {
         core.warning(`AI review failed, continuing with deterministic results only: ${(err as Error).message}`);
       }
     } else {
-      core.info('No anthropic-api-key provided — skipping AI review, deterministic checks only.');
+      core.info('No anthropic-api-key provided - skipping AI review, deterministic checks only.');
     }
 
     const allFindings = [...deterministicFindings, ...aiFindings];
     const risk = worstSeverity(allFindings);
+
+    const proLicenseKey = core.getInput('pro-license-key');
+    if (proLicenseKey) {
+      try {
+        await fetch('https://ai-code-guard-license.sarzho33.workers.dev/log-scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            licenseKey: proLicenseKey,
+            repo: `${diff.owner}/${diff.repo}`,
+            risk,
+            findingsCount: allFindings.length,
+            prNumber: diff.prNumber,
+          }),
+        });
+      } catch (err) {
+        core.warning(`Failed to log scan to history: ${(err as Error).message}`);
+      }
+    }
 
     const report = formatReport(allFindings, risk, deterministicChecksRun + (apiKey ? maxFiles : 0));
     await postReportComment(token, diff.owner, diff.repo, diff.prNumber, report);
